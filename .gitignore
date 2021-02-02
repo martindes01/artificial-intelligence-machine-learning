@@ -1,0 +1,11 @@
+# Ignore auxiliary LaTeX files
+*.aux
+*.log
+*.out
+
+# Ignore main LaTeX output
+artificial-intelligence-machine-learning.pdf
+
+# Ignore miscellaneous work folders
+_resources/
+quizzes/
