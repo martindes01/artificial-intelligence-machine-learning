@@ -1,0 +1,54 @@
+name: LaTeX release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Compile LaTeX source to PDF
+        uses: xu-cheng/latex-action@v2
+        with:
+          root_file: artificial-intelligence-machine-learning.tex
+
+      - name: Get ref information
+        id: get_ref_information
+        run: |
+          # Fetch all tags (workaround for https://github.com/actions/checkout/issues/290)
+          # actions/checkout@v2 currently disables automatic tag following with 'git fetch --no-tags'
+          git fetch --force --tags
+          echo ::set-output name=stripped_name::$(git for-each-ref --count=1 --format='%(refname:lstrip=2)' $GITHUB_REF)
+          echo ::set-output name=subject::$(git for-each-ref --count=1 --format='%(contents:subject)' $GITHUB_REF)
+
+      - name: Determine whether this is a pre-release
+        id: determine_prerelease
+        run: |
+          stripped_name=${{ steps.get_ref_information.outputs.stripped_name }}
+          echo ::set-output name=prerelease::$( [[ ! $stripped_name =~ ^v?0*[1-9][0-9]*\.[0-9]+\.[0-9]+$ ]] && echo true || echo false )
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_ref_information.outputs.stripped_name }}
+          release_name: ${{ steps.get_ref_information.outputs.subject }}
+          prerelease: ${{ steps.determine_prerelease.outputs.prerelease }}
+
+      - name: Upload compiled PDF as release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_name: artificial-intelligence-machine-learning.pdf
+          asset_path: artificial-intelligence-machine-learning.pdf
+          asset_content_type: application/pdf
