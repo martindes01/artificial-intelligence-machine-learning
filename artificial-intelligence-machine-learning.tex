@@ -18,11 +18,19 @@
 % Set default font family to default sans-serif font
 \renewcommand{\familydefault}{\sfdefault}
 
+\usepackage{amsmath} % AMS mathematical facilities for LaTeX
 \usepackage{booktabs} % Publication quality tables in LaTeX
+\usepackage[inline,shortlabels]{enumitem} % Control layout of itemize enumerate description
 \usepackage[skip=\glueexpr\baselineskip\relax]{parskip} % Layout with zero \parindent non-zero \parskip
 \usepackage[onehalfspacing]{setspace} % Set space between lines % setspace must be loaded before hyperref
 
 \PassOptionsToPackage{hyphens}{url}\usepackage{hyperref} % Extensive support for hypertext in LaTeX % hyperref loaded by pdfx
+
+% Set list parameters (using enumitem package)
+\setlist{nosep}
+
+% Define command for typesetting a mathematical function
+\newcommand{\function}[3][]{\mathrm{#2}#1\!\left( #3 \right)}
 
 % Increase penalty for widows and orphans (maximum 10000)
 \widowpenalty = 10000
@@ -42,6 +50,7 @@
     \toprule
     Week & Unit & Title \\
     \midrule
+    1 & 1 & Supervised Learning \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -52,5 +61,8 @@
 \clearpage
 
 \pagenumbering{arabic}
+
+\section{Supervised Learning}
+\input{unit-1/notes.tex}
 
 \end{document}

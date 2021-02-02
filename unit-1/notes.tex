@@ -1,0 +1,65 @@
+\subsection{Machine Learning}
+
+The focus of \emph{machine~learning} is the study and development of computational models capable of improving their performance with experience and acquiring knowledge by themselves.
+Learning algorithms can be classified into three broad groups.
+\begin{description}
+  \item[Unsupervised] learning algorithms, such as the \( k \)-means algorithm, classify input data based on certain inherent properties of that data.
+  \item[Supervised] learning algorithms, such as regression, logistic regression and neural networks, learn trends from annotated data in order to make predictions about previously unseen data.
+  \item[Reinforced] learning algorithms learn how to achieve specific tasks in predefined environments based on rewards.
+\end{description}
+
+\subsection{Terminology and Notation}
+
+\subsubsection{Independent and Dependent Variables}
+
+\emph{Independent variables} take on different values based on the environment.
+\emph{Dependent variables} take on values based on other variables (usually independent variables).
+Dependent variables \emph{depend} on independent variables.
+
+Dependent variables can take on continuous or discrete values.
+The prediction of continuous values is known as \emph{regression}.
+The prediction of discrete values or \emph{classes} is known as \emph{classification}.
+
+For both regression and classification, a supervised learning model consists of
+\begin{itemize}
+  \item a hypothesis function,
+  \item a cost function, and
+  \item a weight update function that uses the partial differential of the cost function.
+\end{itemize}
+
+\subsubsection{Training and Test Data}
+
+The \emph{training data} used in supervised learning are \emph{annotated} with the values of the dependent variable \( y \) for each vector \( \boldsymbol{X} \) of independent variables.
+Each training datum \( i \) is of the form \( \left( \boldsymbol{X}^{(i)}, y^{(i)} \right) \).
+Thus, the training data may be represented in the form
+\begin{equation*}
+  \left( \boldsymbol{X}^{(1)}, y^{(1)} \right), \left( \boldsymbol{X}^{(2)}, y^{(2)} \right), \ldots, \left( \boldsymbol{X}^{(N)}, y^{(N)} \right)
+\end{equation*}
+For each of the \( N \) training inputs \( \boldsymbol{X}^{(i)} \), the corresponding output is \( y^{(i)} \).
+
+The \emph{test data} is an independent set of annotated data on which the trained model is tested.
+While it shares the characteristics of the training data, it contains different elements.
+
+\subsubsection{Hypothesis Function}
+
+The \emph{hypothesis function} \( \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}} \) predicts the output \( y \) that corresponds to the input \( \boldsymbol{X} \)\@.
+For regression, the general form of the hypothesis function is
+\begin{equation*}
+  \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}} = w_0 + w_1 x_1 + w_2 x_2 + \ldots +  w_k x_k
+\end{equation*}
+where \( k \) is an arbitrary number of terms (not necessarily the number of elements in \( \boldsymbol{X} \)), and each term \( x \) may be the product of any combination of elements in \( \boldsymbol{X} \)\@.
+
+The hypothesis function is parametrised by a vector of \emph{weights} \( \boldsymbol{w} \).
+The purpose of a supervised learning algorithm is to find the values of these weights for which the hypothesis function best fits the training data.
+
+\subsubsection{Cost Function}
+
+The accuracy of a hypothesis function is measured using a \emph{cost function}.
+When the cost function is at its minimum, the hypothesis function is said to \emph{fit} the data well.
+
+\subsubsection{Gradient Descent}
+
+The differential of a function gives the equation of the slope of the function.
+The point where the slope is zero is a stationary point (minimum, maximum or point of inflection) of the function.
+Since the determination of the minimum of the cost function may not always be trivial, an algorithm is used.
+\emph{Gradient~descent} is an algorithm that uses the partial derivative of the cost function to find the values of the weights for which the cost function is at its minimum.

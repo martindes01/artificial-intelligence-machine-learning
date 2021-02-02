@@ -12,5 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI build via GitHub Actions on push to non-default branch.
 - Release via GitHub Actions on push of tag matching `v*.*.*`.
 - Changelog based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+- Notes for Unit 1: Supervised Learning.
 
 [Unreleased]: https://github.com/martindes01/artificial-intelligence-machine-learning/compare/root...HEAD
