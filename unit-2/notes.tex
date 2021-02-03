@@ -1,0 +1,122 @@
+\subsection{Univariate Linear Regression}
+
+\subsubsection{Hypothesis Function}
+
+\emph{Univariate linear regression} is used to train a model that assumes a linear relationship between a single independent variable \( x \) and a dependent variable \( y \).
+The hypothesis function for univariate linear regression is of the form
+\begin{equation*}
+  \function[_{\boldsymbol{w}}]{h}{x} = w_{0} + w_{1} x
+\end{equation*}
+This is a linear equation in which \( w_{0} \) represents the \( y \)-intercept and \( w_{1} \) represents the gradient.
+The aim of univariate linear regression is to find the specific values of these parameters such that the line given by the hypothesis function fits the training data.
+
+\subsubsection{Cost Function}
+
+The loss functions typically used for regression are \emph{absolute~deviation} (or \emph{L1~loss}) and \emph{squared~error} (or \emph{L2~loss}).
+For each training sample \( i \), the L1~loss of the prediction is the absolute difference between the actual value \( y^{(i)} \) and the predicted value \( \function[_{\boldsymbol{w}}]{h}{x^{(i)}} \) of the dependent variable.
+\begin{equation*}
+  \left\lvert y^{(i)} - \function[_{\boldsymbol{w}}]{h}{x^{(i)}} \right\rvert
+\end{equation*}
+The corresponding L2~loss is the square of this difference.
+\begin{equation*}
+  \left( y^{(i)} - \function[_{\boldsymbol{w}}]{h}{x^{(i)}} \right)^{2}
+\end{equation*}
+
+Both loss functions return a positive value so that the loss for each sample can be summed meaningfully, regardless of whether the prediction is greater than or less than the actual value.
+L2~loss is the more commonly used loss function, since squaring the difference causes a prediction further from the actual value to incur a greater penalty.
+
+The corresponding cost functions give the average loss over all \( m \) training samples.
+\begin{equation*}
+  \frac{1}{m} \sum_{i=1}^{m} \left\lvert y^{(i)} - \function[_{\boldsymbol{w}}]{h}{x^{(i)}} \right\rvert
+\end{equation*}
+\begin{equation*}
+  \frac{1}{m} \sum_{i=1}^{m} \left( y^{(i)} - \function[_{\boldsymbol{w}}]{h}{x^{(i)}} \right)^{2}
+\end{equation*}
+
+\subsubsection{Gradient Descent}
+
+The gradient~descent algorithm progressively updates the weights that parametrise the hypothesis function in order to minimise its cost.
+The general form of gradient~descent is
+\begin{enumerate}
+  \item while the model has not \emph{converged} (the cost is not minimal),
+  \begin{enumerate}
+    \item for each training sample \( i \),
+    \begin{enumerate}
+      \item calculate the derivative of the loss on \( i \), and
+      \item update all weights \( w \) using this value of the derivative.
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
+
+Each complete iteration over all training elements is known as an \emph{epoch}.
+The model has converged when the weights parametrise the hypothesis function such that its cost is minimal.
+One simple way to check for convergence is to wait until the costs of consecutive epochs are very small.
+
+In the case of univariate linear regression using the derivative of L2~loss, the gradient descent algorithm is
+\begin{enumerate}
+  \item while the model has not \emph{converged} (the cost is not minimal),
+  \begin{enumerate}
+    \item for each training sample \( i \),
+    \begin{align*}
+      \text{Let}\, &{L^{\prime}}_{2}^{(i)} = y^{(i)} - \function[_{\boldsymbol{w}}]{h}{x^{(i)}} \\
+      \text{Let}\, &w_{1} = w_{1} + \alpha \cdot {L^{\prime}}_{2}^{(i)} \cdot x^{(i)} \\
+      \text{Let}\, &w_{0} = w_{0} + \alpha \cdot {L^{\prime}}_{2}^{(i)}
+    \end{align*}
+  \end{enumerate}
+\end{enumerate}
+
+The parameter \( \alpha \) is the \emph{learning rate} and represents the size of each step towards the correct values of \( w \).
+If the learning rate is too large, the cost may begin to rise, causing gradient descent to fail.
+
+\subsection{Multivariate and Non-Linear Regression}
+
+\subsubsection{Hypothesis Functions}
+
+\emph{Multivariate linear regression} is used to train a model that assumes a linear relationship between a vector of independent variables \( \boldsymbol{X} \) and a dependent variable \( y \).
+The hypothesis function for multivariate linear regression is of the form
+\begin{equation*}
+  \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}} = w_{0} + w_{1} x_{1} + w_{2} x_{2} + \ldots
+\end{equation*}
+A term \( x^{(j)}_{i} \) refers to the \( i \)th input attribute of the \( j \)th training sample.
+
+\emph{Univariate non-linear regression} is used to train a model that assumes a non-linear relationship between a single independent variable \( x \) and a dependent variable \( y \).
+The hypothesis function for univariate non-linear regression is of the form
+\begin{equation*}
+  \function[_{\boldsymbol{w}}]{h}{x} = w_{0} + w_{1} x^{1} + w_{2} x^{2} + \ldots
+\end{equation*}
+
+\emph{Multivariate non-linear regression} is used to train a model that assumes a non-linear relationship between a vector of independent variables \( \boldsymbol{X} \) and a dependent variable \( y \).
+The hypothesis function for multivariate non-linear regression is of the form
+\begin{equation*}
+  \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}} = w_{0} + w_{1} x_{1} + w_{2} x_{2} + w_{3} x_{1} x_{2} + w_{4} x_{1}^{2} + w_{5} x_{2}^{2} + \ldots
+\end{equation*}
+
+\subsubsection{Cost Function}
+
+The cost functions used for univariate linear regression do not change for multivariate or non-linear regression.
+Only the hypothesis function \( \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}} \) used to predict the dependent variable \( y \) changes.
+The general L2~cost function is
+\begin{equation*}
+  \frac{1}{m} \sum_{i=1}^{m} \left( y^{(i)} - \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}^{(i)}} \right)^{2}
+\end{equation*}
+
+\subsubsection{Gradient Descent}
+
+The general gradient~descent algorithm also applies to multivariate and non-linear regression.
+The only changes are the hypothesis function \( \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}} \) and the number of weights \( w \) to be updated.
+The general gradient~descent algorithm using the derivative of L2~loss is
+\begin{enumerate}
+  \item while the model has not \emph{converged} (the cost is not minimal),
+  \begin{enumerate}
+    \item for each training sample \( j \),
+    \begin{equation*}
+      \text{Let}\, {L^{\prime}}_{2}^{(j)} = y^{(j)} - \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}^{(j)}} \\
+    \end{equation*}
+    \begin{enumerate}
+      \item for each weight \( w_{i} \) and its corresponding \( x \)-term \( \function[_{i}]{f}{\boldsymbol{X}^{(j)}} \) in the hypothesis function,
+      \begin{equation*}
+        \text{Let}\, w_{i} = w_{i} + \alpha \cdot  {L^{\prime}}_{2}^{(j)} \cdot \function[_{i}]{f}{\boldsymbol{X}^{(j)}}
+      \end{equation*}
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
