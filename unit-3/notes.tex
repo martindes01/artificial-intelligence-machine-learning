@@ -1,0 +1,112 @@
+\subsection{Binary Classification}
+
+\emph{Logistic~regression} is used as a form of \emph{binary~classification}.
+Instead of training a model to predict a trend, logistic regression is used to train a model that predicts whether a sample belongs to a discrete class.
+A logistic regression model produces a continuous output value between zero and one that is interpreted as the probability that the sample belongs to the class.
+
+\subsection{Hypothesis and Activation Functions}
+
+The hypothesis function for logistic regression is better known as an \emph{activation function}.
+One common class of activation function is the \emph{logistic function}, which is itself a \emph{sigmoid function}.
+The basic logistic function \( \function{g}{z} \) returns a value in the finite domain from zero to one.
+\begin{equation*}
+  \function{g}{z} = \frac{1}{1 + e^{-z}}
+\end{equation*}
+\begin{equation*}
+  \begin{cases}
+    \begin{aligned}
+      0.5 < \function{g}{z} &< 1 & \text{when } z &> 0 \text{,} \\
+      \function{g}{z} &= 0.5 & \text{when } z &= 0 \text{,} \\
+      0 < \function{g}{z} &< 0.5 & \text{when } z &< 0 \text{.}
+    \end{aligned}
+  \end{cases}
+\end{equation*}
+
+Thus, hypothesis functions that use the logistic function \( \function{g}{z} \) as an activation function can be expressed in the form
+\begin{equation*}
+  \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}} = \function{g}{\boldsymbol{w}^{\mathrm{T}} \boldsymbol{X}}
+\end{equation*}
+
+The hypothesis function for univariate linear logistic regression is of the form
+\begin{equation*}
+  \function[_{\boldsymbol{w}}]{h}{x} = \function{g}{w_{0} + w_{1} x}
+\end{equation*}
+
+The hypothesis function for multivariate linear logistic regression is of the form
+\begin{equation*}
+  \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}} = \function{g}{w_{0} + w_{1} x_{1} + w_{2} x_{2} + \ldots}
+\end{equation*}
+
+The hypothesis function for univariate non-linear logistic regression is of the form
+\begin{equation*}
+  \function[_{\boldsymbol{w}}]{h}{x} = \function{g}{w_{0} + w_{1} x + w_{2} x^{2} + \ldots}
+\end{equation*}
+
+The hypothesis function for multivariate non-linear logistic regression is of the form
+\begin{equation*}
+  \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}} = \function{g}{w_{0} + w_{1} x_{1} + w_{2} x_{2} + w_{3} x_{1} x_{2} + w_{4} x_{1}^{2} + w_{5} x_{2}^{2} + \ldots}
+\end{equation*}
+
+\subsection{Decision Boundary}
+
+The \emph{decision boundary} separates samples that do not belong to the class from samples that do.
+Data with \( N \) input attributes may be plotted in \( N \)-dimensional space.
+The decision boundary is an object that can be expressed in \( N - 1 \) dimensions, separates samples in \( N \)-dimensional space and extends infinitely far.
+For example, data with two input attributes can be plotted on a plane and separated by line.
+Classes for which the decision boundary is a straight or flat object, such as a point, line, plane or hyperplane, are said to be \emph{linear~separable}.
+These classes are predicted by linear logistic regression models.
+
+The decision boundary is formed by all possible points where the hypothesis function is equal to a specific value.
+Using the basic logistic function, this value is typically \( \function{g}{0} = 0.5 \).
+Samples for which \( \function{g}{\boldsymbol{w}^{\mathrm{T}} \boldsymbol{X}} \geq 0.5 \) are predicted to belong to the class.
+Samples for which \( \function{g}{\boldsymbol{w}^{\mathrm{T}} \boldsymbol{X}} < 0.5 \) are predicted not to belong to the class.
+
+\subsection{Cost Function}
+
+The cost function evaluates the accuracy of the hypothesis function with respect to a set of training samples.
+The derivative of the cost function is used in the gradient~descent algorithm to update the weights that parametrise the hypothesis function.
+For gradient~descent to work, the cost function must be convex.
+The cost functions used in linear regression cannot be used to evaluate the accuracy of a sigmoid function, as the resultant combination is not convex, and the gradient descent algorithm is likely to converge on a local minimum, rather than the global minimum.
+
+The loss of a single sample in logistic regression is given by
+\begin{multline*}
+  - y^{(i)} \log \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}^{(i)}} - \left( 1 - y^{(i)} \right) \function{\log}{1 - \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}^{(i)}}} \\
+  = \begin{cases}
+    - y^{(i)} \log \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}^{(i)}} & \text{when } y^{(i)} = 1 \text{,} \\
+    - \left( 1 - y^{(i)} \right) \function{\log}{1 - \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}^{(i)}}} & \text{when } y^{(i)} = 0 \text{.}
+  \end{cases}
+\end{multline*}
+This expression has the following useful properties.
+\begin{itemize}
+  \item Since the actual value \( y^{(i)} \) of the dependent variable can only be zero or one, only one term of the expression contributes to the loss for a single sample.
+  \item When the actual value \( y^{(i)} \) is zero and the prediction \( \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}^{(i)}} \) is zero, the loss is zero.
+  \item When the actual value \( y^{(i)} \) is zero and the prediction \( \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}^{(i)}} \) tends towards one, the loss tends towards infinity.
+  \item When the actual value \( y^{(i)} \) is one and the prediction \( \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}^{(i)}} \) is one, the loss is zero.
+  \item When the actual value \( y^{(i)} \) is one and the prediction \( \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}^{(i)}} \) tends towards zero, the loss tends towards infinity.
+\end{itemize}
+
+The corresponding cost over all \( m \) training samples is given by
+\begin{equation*}
+  - \frac{1}{m} \sum_{i=1}^{m} \left( y^{(i)} \log \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}^{(i)}} + \left( 1 - y^{(i)} \right) \function{\log}{1 - \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}^{(i)}}} \right)
+\end{equation*}
+
+\subsection{Gradient Descent}
+
+The general gradient~descent algorithm also applies to logistic regression.
+The only changes are the hypothesis function \( \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}} \) and the number of weights \( w \) to be updated.
+The general gradient~descent algorithm for logistic regression is
+\begin{enumerate}
+  \item while the model has not \emph{converged} (the cost is not minimal),
+  \begin{enumerate}
+    \item for each training sample \( j \),
+    \begin{equation*}
+      \text{Let}\, {L^{\prime}}_{2}^{(j)} = y^{(j)} - \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}^{(j)}} \\
+    \end{equation*}
+    \begin{enumerate}
+      \item for each weight \( w_{i} \) and its corresponding \( x \)-term \( \function[_{i}]{f}{\boldsymbol{X}^{(j)}} \) in the hypothesis function,
+      \begin{equation*}
+        \text{Let}\, w_{i} = w_{i} + \alpha \cdot  {L^{\prime}}_{2}^{(j)} \cdot \function[_{i}]{f}{\boldsymbol{X}^{(j)}}
+      \end{equation*}
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
