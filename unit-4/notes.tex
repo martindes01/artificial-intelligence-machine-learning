@@ -1,0 +1,98 @@
+\subsection{Neural Networks}
+
+\subsubsection{Motivation}
+
+A hypothesis function that is both non-linear and highly multivariate will have a large number of weights.
+Optimising a large number of weights using gradient descent is impractical.
+In these situations, it is useful to break the problem down into smaller linear regression problems.
+
+\subsubsection{Structure of a Neural Network}
+
+A \emph{neural~network} comprises many \emph{linear logistic regression units} (also known as \emph{logits}, \emph{perceptrons}, or more generally \emph{neurons} or \emph{nodes}).
+The nodes are grouped into an \emph{input} layer, one or more \emph{hidden} layers, and an \emph{output} layer.
+Typically, each node in a layer is an input to every node in the following layer.
+The number of nodes in the input layer is one more than the number of input attributes in the data.
+The additional node is known as a \emph{bias}, and holds the constant value of one, which corresponds to the implicit constant term that is multiplied by the weight \( w_{0} \) to give the \( y \)-intercept.
+Bias nodes exist to allow functions that do not pass through the origin to be captured.
+
+Each logistic regression unit has its own weight vector \( \boldsymbol{w} \), and applies a linear hypothesis function \( \function[_{\boldsymbol{w}}]{h}{\boldsymbol{X}} \) to its inputs \( \boldsymbol{X} \).
+The output node is also a logistic regression unit with its own weights and a bias input node in the preceding hidden layer.
+
+The total cost of a neural network is the sum of the linear (typically L2) costs of its output nodes.
+Finding the derivative of the cost function to use in gradient descent is non-trivial.
+An algorithm such as \emph{backpropagation} is used to implement automatic differentiation and to update the weights.
+
+\emph{Deep~learning} is a machine learning technique that uses a neural~network with multiple hidden layers.
+
+\subsubsection{Multinomial Classification}
+
+In a \emph{multinomial} or \emph{multiclass} neural network, each output node produces the probability that a sample belongs to a particular class.
+This is known as a \emph{one-versus-all} probability; the probability that a sample belongs to a particular class is the complement of the probability that it belongs to any other class that may be predicted by the model.
+Since each output probability describes a different class, there is no constraint that the sum of the output probabilities is one.
+Nevertheless, the probability associated with one class is useful for predicting the probabilities associated with other classes.
+For example, a high probability that a sample belongs to one class suggests that the probability of the sample belonging to another class is low.
+Typically, the predicted class is that returned by the \emph{softargmax} function --- a function that normalises a vector of probabilities and returns the index of the greatest.
+
+\subsubsection{Training Data and Test Data}
+
+\emph{Training data} is used to create a model.
+\emph{Test data} is used evaluate the model after it has been trained.
+Both training data and test data are annotated so that the accuracy of predictions may be measured.
+The test data must be separate from the training data to ensure the model is tested on unseen samples.
+Testing the model on the data on which it is trained would produce meaningless results.
+Nevertheless, it is important that the test data has similar characteristics, such as probability distribution, to the training data.
+A model can only make a reliable prediction on data similar to what it has already encountered.
+In other words, regression is used to interpolate between known data.
+
+\subsubsection{Overfitting}
+
+A model that fits the training data too closely may make poor predictions on unseen data.
+While the training data is similar to unseen data, they are not exactly the same.
+\emph{Overfitting} can be identified when the performance on the training data increases over consecutive epochs while the performance on the test data reduces.
+Overfitting is the result of a model that is more complex than required.
+\emph{Complexity} is determined by the number of non-linear terms in the hypothesis function and the magnitude of the weights associated to them.
+
+\subsubsection{Regularisation}
+
+\emph{Regularisation} diminishes the effects of high-order polynomial terms in a hypothesis function by penalising any high weights associated to them.
+This helps to prevent overfitting.
+
+For example, \emph{L2 regularisation} adds a weighted sum of the squares of the weights to the cost of the hypothesis.
+\begin{equation*}
+  \text{Let cost} = \text{cost} + \lambda \sum_{i=1}^{m} w_{i}^{2}
+\end{equation*}
+
+More generally, regularisation can be achieved by
+\begin{itemize}
+  \item including regularisation penalties for each logistic regression unit,
+  \item dropout --- bypassing certain nodes (typically half) during training to prevent the network from learning the training data too well, or
+  \item reducing the network depth.
+\end{itemize}
+
+\subsubsection{Activation Functions}
+
+Each logistic regression unit applies an activation function to the sum of its weighted inputs.
+Sigmoid functions are only one class of activation function.
+Others include the \emph{hyperbolic tangent} (\emph{tanh}) and \emph{rectified linear unit} (\emph{ReLU}).
+
+\subsection{Hyperparameters}
+
+The performance of a neural network is governed by a number of parameters, such as the number of nodes and layers, the method of regularisation, the activation function and the learning rate.
+These are known as \emph{hyperparameters}.
+
+\emph{Hyperparameter optimisation} --- the process of selecting the correct combination of hyperparameters --- can be critical to the success of a project.
+It can also be incredibly expensive in terms of time and computational resources.
+One method of hyperparameter optimisation is \emph{grid~search}, which involves testing all possible combinations of hyperparameters in order to find the most performant.
+
+It is possible for a combination of hyperparameters to fit the test data so well that it does not work on a new set of data.
+To prevent this, hyperparameter combinations may be tested against another set of annotated data --- \emph{validation data}.
+
+\subsection{Metrics}
+
+The \emph{accuracy} metric is simply the proportion of predictions that are correct.
+While this is intuitive, it fails to penalise false positives, particularly when the distribution of classes in the test data is not equal.
+For example, a hypothesis function that predicts all samples belong to a particular class regardless of their independent attributes is not very useful.
+Yet, when tested on a set of test data in which \( 90\% \) of all samples belong to that class, it will achieve an accuracy of \( 90\% \).
+
+Usually, a better metric to use is the \emph{F1~score}.
+This is the harmonic mean of \emph{precision} --- the proportion of selected samples that are relevant --- and \emph{recall} --- the proportion of relevant samples that are selected.
