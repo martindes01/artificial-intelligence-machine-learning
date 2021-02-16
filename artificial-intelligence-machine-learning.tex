@@ -24,11 +24,15 @@
 \usepackage[inline,shortlabels]{enumitem} % Control layout of itemize enumerate description
 \usepackage[skip=\glueexpr\baselineskip\relax]{parskip} % Layout with zero \parindent non-zero \parskip
 \usepackage[onehalfspacing]{setspace} % Set space between lines % setspace must be loaded before hyperref
+\usepackage{titlesec} % Select alternative section titles
 
 \PassOptionsToPackage{hyphens}{url}\usepackage{hyperref} % Extensive support for hypertext in LaTeX % hyperref loaded by pdfx
 
 % Set list parameters (using enumitem package)
 \setlist{nosep}
+
+% Set section break command (using package titlesec)
+\newcommand{\sectionbreak}{\clearpage}
 
 % Define command for typesetting a mathematical function
 \newcommand{\function}[3][]{\mathrm{#2}#1\!\left( #3 \right)}
