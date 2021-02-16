@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Notes for Unit 5: Na&iuml;ve Bayes.
 
+### Changed
+
+- Start sections on a new page.
+
 ## [0.4.0] &ndash; 2021-02-10
 
 ### Added
