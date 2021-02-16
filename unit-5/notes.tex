@@ -1,0 +1,160 @@
+\subsection{Probability Theory}
+
+\subsubsection{Random Variables}
+
+Variables in probability theory are known as \emph{random variables}.
+The \emph{domain} of a random variable is the set of values it can take.
+For regression, the output domain is, in general, the set of real numbers \( \mathbb{R} \)\@.
+For classification, the output domain is a finite set of ordinals or categories.
+
+\subsubsection{Probability Distributions}
+
+A probability distribution \( \function{P}{X = x} \) is a function that maps a possible value \( x \) of a random variable \( X \) in domain \( \mathcal{X} \) to the probability of observing it.
+When the name of the variable \( X \) is obvious or irrelevant, it may be omitted.
+The sum of all probabilities in a probability distribution is one.
+\begin{equation*}
+  \sum_{x \in \mathcal{X}} \function{p}{x} = 1
+\end{equation*}
+
+An \emph{unconditional} or \emph{prior} probability distribution describes the probabilities of different observations in the absence of additional information.
+
+A \emph{conditional} or \emph{posterior} probability distribution describes the probabilities of different events given some evidence.
+For example, the probability of an event \( Y \) given an event \( X \) is expressed as
+\begin{equation*}
+  \function{P}{Y \vert X}
+\end{equation*}
+
+A \emph{joint} probability distribution describes the probability of two events occurring together.
+For example, the probability of an events \( X \) and \( Y \) occurring together is expressed as
+\begin{equation*}
+  \function{P}{X, Y} = \function{P}{X \text{ and } Y} = \function{P}{X \land Y}
+\end{equation*}
+
+For the purposes of machine learning, it can be assumed that a process generates data (training, test or other) based on an unknown joint probability distribution \( \function{P}{\boldsymbol{X}, Y} \) between a vector of independent input variables \( \boldsymbol{X} \), each in a domain \( \mathcal{X} \), and a dependent output variable \( Y \) in the domain \( \mathcal{Y} \).
+
+\subsubsection{Probability Density Functions}
+
+A \emph{continuous variable} can take an infinite number of values between any two limits.
+A \emph{probability density function} describes the relative likelihood of a continuous variable taking a value between two limits.
+The area under the curve of a probability density function \( \function{f}{X} \) between two values \( a \) and \( b \) of a variable \( X \) represents the probability of the variable falling between those values.
+\begin{equation*}
+  \function{P}{a \leq X \leq b} = \int_{a}^{b} \function{f}{X}\, \mathrm{d} X
+\end{equation*}
+
+Since there are an infinite number of values that a continuous variable can take, the relative likelihoods of all values do not sum to one.
+Instead, the area under the curve of the probability density function is one.
+
+\subsection{Bayes' Theorem}
+
+A joint probability distribution \( \function{P}{\boldsymbol{X}, Y} \) can be expressed as
+\begin{equation*}
+  \function{P}{\boldsymbol{X}, Y} = \function{P}{\boldsymbol{X}} \function{P}{Y \vert \boldsymbol{X}} = \function{P}{Y} \function{P}{\boldsymbol{X} \vert Y}
+\end{equation*}
+Bayes' theorem states that
+\begin{equation*}
+  \function{P}{X \vert Y} = \frac{\function{P}{X} \function{P}{Y \vert X}}{\function{P}{Y}}
+\end{equation*}
+
+In terms of machine learning, the joint probability of observing a vector of input attributes \( \boldsymbol{a} \) with an output class \( c \) is
+\begin{equation*}
+  \function{p}{\boldsymbol{a}, c} = \function{p}{\boldsymbol{a}} \function{p}{c \vert \boldsymbol{a}} = \function{p}{c} \function{p}{\boldsymbol{a} \vert c}
+\end{equation*}
+Thus, the probability of observing a particular class \( c \) given a vector of input attributes \( \boldsymbol{a} \) is given by
+\begin{equation*}
+  \function{p}{c \vert \boldsymbol{a}} = \frac{\function{p}{c} \function{p}{\boldsymbol{a} \vert c}}{\function{p}{\boldsymbol{a}}}
+\end{equation*}
+
+A machine learning model could learn the unconditional probabilities \( \function{p}{\boldsymbol{a}} \) and \( \function{p}{c} \), and the conditional probability \( \function{p}{\boldsymbol{a} \vert c} \), and use them to make predictions based on Bayes' theorem.
+Learning the probabilities is a simple case of keeping track of the frequencies of different input and output values, and their combinations.
+
+\subsection{Normalisation}
+
+The denominator \( \function{p}{\boldsymbol{a}} \) acts as a normalisation factor that ensures the probabilities for all classes \( c \), given input attributes \( \boldsymbol{a} \), sum to one.
+\begin{equation*}
+  \sum_{c \in \mathcal{Y}} \function{p}{c \vert \boldsymbol{a}} = \sum_{c \in \mathcal{Y}} \frac{\function{p}{c} \function{p}{\boldsymbol{a} \vert c}}{\function{p}{\boldsymbol{a}}} = 1
+\end{equation*}
+Since the normalisation factor is the same for every class, it can be extracted as follows.
+\begin{equation*}
+  \function{p}{c \vert \boldsymbol{a}} = \alpha \function{p}{c} \function{p}{\boldsymbol{a} \vert c}, \quad \alpha = \beta^{-1}, \quad \beta = \sum_{c \in \mathcal{Y}} \function{p}{c} \function{p}{\boldsymbol{a} \vert c}
+\end{equation*}
+This notation is useful as the assumptions made by the na\"{i}ve Bayes model cause \( \function{p}{\boldsymbol{a}} \) not to work as a normalising factor.
+
+\subsection{Na\"{i}ve Bayes for Categorical Independent Variables}
+
+\subsubsection{Conditional Independence}
+
+Bayes' theorem for \( n \) independent variables where \( n \geq 1 \) expands from
+\begin{equation*}
+  \function{p}{c \vert \boldsymbol{a}} = \alpha \function{p}{c} \function{p}{\boldsymbol{a} \vert c}
+\end{equation*}
+to
+\begin{equation*}
+  \function{p}{c \vert a_{1}, \ldots, a_{n}} = \alpha \function{p}{c} \function{p}{a_{1}, \ldots, a_{n} \vert c}
+\end{equation*}
+
+For large \( n \), the number of possible combinations of input variables, and, therefore, the number of rows to be maintained in a frequency table, become intractable.
+Instead, na\"{i}ve Bayes classifiers assume that each independent variable \( X \) is conditionally independent of every other independent variable, given the dependent variable \( Y \).
+Thus, a smaller, separate frequency table can be maintained for each independent variable, and it can be assumed that
+\begin{equation*}
+  \function{p}{a_{1}, \ldots, a_{n} \vert c} = \prod_{i=1}^{n} \function{p}{a_{i} \vert c}
+\end{equation*}
+
+Thus, the na\"{i}ve Bayes equation becomes
+\begin{equation*}
+  \function{p}{c \vert \boldsymbol{a}} = \alpha \function{p}{c} \prod_{i=1}^{n} \function{p}{a_{i} \vert c}, \quad \alpha = \beta^{-1}, \quad \beta = \sum_{c \in \mathcal{Y}} \left( \function{p}{c} \prod_{i=1}^{n} \function{p}{a_{i} \vert c} \right)
+\end{equation*}
+
+\subsubsection{Laplace Smoothing}
+
+One problem with this basic na\"{i}ve Bayes approach is that if there are no observations for a particular attribute value \( a_{i} \), the probability \( \function{p}{a_{i} \vert c} \) is zero, and, therefore, the entire probability \( \function{p}{c \vert \boldsymbol{a}} \) of observing the class \( c \) given the attributes \( \boldsymbol{a} \) is also zero, regardless of the values of the other attributes.
+Although there may be no samples with this combination of class and attributes in the training data, it cannot be assumed that the combination is impossible.
+
+To solve this problem, the constant value of one can be added to the observation frequencies of every attribute for each class.
+This is known as \emph{Laplace~smoothing}.
+The smoothed frequencies are used to calculate the conditional probabilities \( \function{p}{a_{i} \vert c} \).
+The original frequencies are used to calculate the unconditional probabilities \( \function{p}{c} \).
+
+\subsection{Na\"{i}ve Bayes for Numeric Independent Variables}
+
+Typically, na\"{i}ve Bayes adopts a \emph{Gaussian distribution} (also known as a \emph{normal distribution}) for each numeric independent variable.
+The probability density function of a Gaussian distribution \( \function{\mathcal{N}}{\mu, \sigma^{2}} \) with mean \( \mu \) and variance \( \sigma^{2} \) is given by
+\begin{equation*}
+  \function{P}{X = a \vert \mu, \sigma^{2}} = \frac{1}{\sqrt{2 \sigma^{2} \pi}} e^{- \frac{\left( a - \mu \right)^{2}}{2 \sigma^{2}}}
+\end{equation*}
+
+The na\"{i}ve Bayes model can learn the values of the parameters \( \mu \) and \( \sigma^{2} \) for each numeric attribute \( a_{i} \), and use them to calculate the relative likelihoods \( \function{p}{a_{i} \vert c} \) to use in the na\"{i}ve Bayes equation.
+
+The mean \( \mu \) and variance \( \sigma^{2} \) for an attribute given a particular class are calculated using the set of observed values \( V \) of the attribute for that class.
+\begin{gather*}
+  \mu = \frac{1}{\left\lvert V \right\rvert} \sum_{v \in V} v \\
+  \sigma^{2} = \frac{1}{\left\lvert V \right\rvert - 1} \sum_{v \in V} \left( v - \mu \right)^{2}
+\end{gather*}
+
+\subsection{Combined Na\"{i}ve Bayes Approach}
+
+The na\"{i}ve Bayes learning algorithm creates and, therefore, a na\"{i}ve Bayes model comprises
+\begin{itemize}
+  \item frequency tables with an without Laplace~smoothing for categorical independent variables, and
+  \item tables of probability density function parameters for numeric independent variables.
+\end{itemize}
+
+Na\"{i}ve Bayes assumes conditional independence of independent variables and predicts the class with the greatest \( \function{p}{c \vert a_{i}, \ldots, a_{n}} \).
+\begin{equation*}
+  \function{p}{c \vert \boldsymbol{a}} = \alpha \function{p}{c} \prod_{i=1}^{n} \function{p}{a_{i} \vert c}, \quad \alpha = \beta^{-1}, \quad \beta = \sum_{c \in \mathcal{Y}} \left( \function{p}{c} \prod_{i=1}^{n} \function{p}{a_{i} \vert c} \right)
+\end{equation*}
+The unconditional probability \( \function{p}{c} \) is calculated using frequency tables without Laplace~smoothing.
+For categorical independent variables, the unconditional probability \( \function{p}{a_{i} \vert c} \) is calculated using frequency tables with Laplace~smoothing.
+For numeric independent variables, the relative likelihood \( \function{p}{a_{i} \vert c} \) is calculated using probability density functions using learnt parameters.
+
+The advantages of the na\"{i}ve Bayes approach are that
+\begin{itemize}
+  \item it is fast --- only one pass through the data is needed to learn its parameters, and
+  \item the relative probabilities computed by the approach are suitable for many applications, including text categorisation and medical diagnosis.
+\end{itemize}
+
+The disadvantages of the na\"{i}ve Bayes approach are that
+\begin{itemize}
+  \item it assumes conditional independence of independent variables,
+  \item it assumes a probability distribution for numeric independent variables,
+  \item it does not work very well for regression problems, although variations of na\"{i}ve Bayes do exist for regression.
+\end{itemize}
