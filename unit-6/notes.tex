@@ -1,0 +1,85 @@
+\subsection{Structure of a Decision Tree}
+
+A \emph{decision~tree} is a predictive model with a tree-like structure.
+An \emph{internal~node} specifies a test to be be carried out on a single input attribute, and has a branch to be followed for each possible outcome of the test.
+A \emph{leaf~node} indicates the value of the output attribute.
+A prediction is made by starting at the root node, performing the test indicated by the current node, and following the outcome branch, continuing until a leaf node is reached.
+Irrelevant or redundant attributes do not appear on a tree.
+The smaller a tree, the easier it is to understand.
+
+Depending on the type of its output attribute, a decision~tree can be either a \emph{classification~tree} or a \emph{regression~tree}.
+Input attributes can be numerical, categorical or ordinal.
+
+\subsection{Construction of a Decision Tree}
+
+\subsubsection{General Procedure}
+
+Decision trees are constructed by recursively splitting nodes until certain termination criteria are met.
+To construct a decision tree
+\begin{enumerate}
+  \item create a root node and split it on the input attribute that best separates the samples associated with it into different classes (the attribute is that which provides the greatest information~gain),
+  \item create a node for each outcome branch, and
+  \item continue splitting nodes using the same procedure.
+\end{enumerate}
+Splitting on a particular branch stops when
+\begin{itemize}
+  \item all samples associated with a node have the same output class --- the node is made a leaf node of that class,
+  \item there are no further attributes on which to split the node, but not all samples associated with the node have the same output class --- the node is made a leaf node of the majority class, or
+  \item there are no samples associated with the node --- the node is made a leaf node of the majority class of its parent node.
+\end{itemize}
+
+\subsubsection{Entropy}
+
+\emph{Entropy} is a measure of the impurity of a set of training samples.
+A set in which samples are distributed equally among classes is \emph{impure}.
+Impurity corresponds to high entropy.
+A set in which all samples belong to the same class is \emph{pure}.
+Purity corresponds to low entropy.
+
+The entropy of a set of samples \( S \) that can belong to either class~A or class~B is defined in terms of the proportion of samples \( p_{\mathrm{A}} \) that belong to class~A, and the proportion of samples \( p_{\mathrm{B}} \) that belong to class~B.
+\begin{equation*}
+  \function{\text{entropy}}{S} = - p_{\mathrm{A}} \log_{2} p_{\mathrm{A}} - p_{\mathrm{B}} \log_{2} p_{\mathrm{B}}
+\end{equation*}
+
+More generally, the entropy of a set of samples \( S \) that can belong to any class \( c \) in the set of classes \( K \) is given by
+\begin{equation*}
+  \function{\text{entropy}}{S} = - \sum_{c \in K} p_{c} \log_{2} p_{c}
+\end{equation*}
+
+\subsubsection{Information Gain}
+
+\emph{Information~gain} is a reduction in entropy (an increase in purity).
+For classification problems, the input attribute that best separates the training samples into different classes is that which provides the greatest information~gain.
+
+The information~gain of splitting a set of samples \( S \) by an attribute \( A \) with domain \( \mathcal{A} \) is given by
+\begin{equation*}
+  \function{\text{infogain}}{S, A} = \function{\text{entropy}}{S} - \sum_{a \in \mathcal{A}} \frac{\left\lvert S_{a} \right\rvert}{\left\lvert S \right\rvert} \function{\text{entropy}}{S_{a}}
+\end{equation*}
+where \( S_{a} \) is the subset of samples of \( S \) whose attribute \( A \) has the value \( a \).
+
+\subsubsection{Formal Algorithm}
+
+The formal algorithm for constructing a decision tree from a set of training samples \( S \) is as follows.
+\begin{enumerate}
+  \item Create a root node for the tree and associate all samples \( S \) with it.
+  \item If all samples belong to the same class, return the root node as the leaf node of that class.
+  \item If there are no more input attributes on which to split, return the root node as a leaf node of the majority class of the samples \( S \)\@.
+  \item Select the remaining attribute \( A \) that provides the greatest information~gain.
+  \item For each value \( a \) of \( A \),
+  \begin{enumerate}
+    \item add a new branch below the root node that corresponds to \( A = a \),
+    \item find the subset of samples \( S_{a} \) that correspond to \( A = a \),
+    \item if \( S_{a} \) is empty, add a leaf node below this branch and assign to it the majority class of the samples \( S \),
+    \item else run this algorithm using \( S_{a} \) as \( S \) and add the resulting subtree below this branch.
+  \end{enumerate}
+  \item Return the tree starting from the root node.
+\end{enumerate}
+
+\subsection{Application of Decision Trees}
+
+The main advantage of a decision tree is that it is easy to visualise and interpret.
+Nevertheless, decision trees can grow very large even though they eliminate redundant and irrelevant attributes.
+They can also vary significantly when trained on different sample sets.
+
+Decision trees are suitable for problems in which input attributes are discrete (categorical or ordinal), and an interpretable model is required.
+Decision trees have been used successfully to classify medical patients by their diseases, and equipment malfunctions by their causes.
