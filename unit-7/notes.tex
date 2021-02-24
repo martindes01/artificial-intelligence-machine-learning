@@ -1,0 +1,72 @@
+\subsection{Overview}
+
+\( k \)\emph{-nearest neighbours} (\( k \)\emph{-NN}) is an intuitive approach that works by finding the training samples most similar to the new sample.
+For classification, the \( k \)\emph{-NN} algorithm predicts the majority output class of the \( k \) nearest neighbours, where \( k \) is a positive integer and typically small.
+For binary classification, an odd number is chosen for \( k \) to ensure that such a majority exists.
+For regression problems, the algorithm predicts the average or median output attribute of the \( k \) nearest neighbours.
+
+\subsection{Distance}
+
+\subsubsection{Euclidean Distance}
+
+Given an instance whose output attribute is to be predicted, the \( k \) nearest samples to the instance must be found using some distance metric on the input space.
+Usually, Euclidean distance is used.
+The Euclidean distance \( \function{d}{\boldsymbol{x}^{(i)} ,\boldsymbol{x}^{(j)}} \) between a sample input vector \( \boldsymbol{x}^{(i)} \) and a previously unseen input vector \( \boldsymbol{x}^{(j)} \) in \( N \)-dimensional space is given by
+\begin{equation*}
+  \begin{aligned}
+    \function{d}{\boldsymbol{x}^{(i)} ,\boldsymbol{x}^{(j)}} &= \sqrt{\sum_{n=1}^{N} \left( x_{n}^{(j)} - x_{n}^{(i)} \right)^{2}} \\
+    &= \sqrt{\left( x_{1}^{(j)} - x_{1}^{(i)} \right)^{2} + \left( x_{2}^{(j)} - x_{2}^{(i)} \right)^{2} + \ldots + \left( x_{N}^{(j)} - x_{N}^{(i)} \right)^{2}}
+  \end{aligned}
+\end{equation*}
+
+\subsubsection{Normalisation}
+
+One problem with calculating distance arises from the scales used to measure different numeric input attributes.
+An input attribute whose values cover a large range will tend to contribute greatly towards the distance.
+This means that changing the unit used to express the measurement of an input attribute can produce a vast difference in predictions, even though the meaning of the measurement has not changed.
+
+A common solution is to normalise numeric input attributes such that their values always fall between zero and one, inclusive.
+The normalised value \( {x^{\prime}}_{n}^{(i)} \) of the input attribute \( n \) of a sample \( \boldsymbol{x}^{(i)} \) is calculated using the minimum and maximum values of the attribute \( n \) as follows.
+\begin{equation*}
+  {x^{\prime}}_{n}^{(i)} = \frac{x_{n}^{(i)} - \min_{n}}{\max_{n} - \min_{n}}
+\end{equation*}
+If the global minimum and maximum possible values of the attribute are unknown, the sample minimum and maximum values are used.
+
+\subsubsection{Ordinal and Categorical Input Attributes}
+
+The possible values of an ordinal input attribute are mapped to equidistant values from zero to one, inclusive.
+For an ordinal attribute with \( m \) possible values, this can be achieved by normalising the one-based index using a minimum of one and a maximum of \( m \).
+The resulting values can be used to calculate Euclidean distances for the attribute.
+
+The distance between two values of a categorical attribute \( n \) is zero if the values are equal, or one if they are not.
+\begin{equation*}
+  x_{n}^{(j)} - x_{n}^{(i)} = \begin{cases}
+    0 & \text{if } x_{n}^{(i)} = x_{n}^{(j)}, \\
+    1 & \text{otherwise}.
+  \end{cases}
+\end{equation*}
+
+\subsection{Prediction}
+
+Given training samples of the form \( \left( \boldsymbol{x}^{(i)}, y^{(i)} \right) \), a number of neighbours \( k \), and vectors of the minimum and maximum values for each attribute, the output attribute \( y^{(j)} \) of a new input vector \( \boldsymbol{x}^{(j)} \) is computed as follows.
+\begin{enumerate}
+  \item Update the minimum and maximum of each attribute using the values of \( \boldsymbol{x}^{(j)} \).
+  \item Normalise each attribute of \( \boldsymbol{x}^{(j)} \) to produce a normalised vector \( {\boldsymbol{x}^{\prime}}^{(j)} \).
+  \item For each training sample \( \left( \boldsymbol{x}^{(i)}, y^{(i)} \right) \),
+  \begin{enumerate}
+    \item normalise each attribute of \( \boldsymbol{x}^{(i)} \) to produce a normalised vector \( {\boldsymbol{x}^{\prime}}^{(i)} \),
+    \item calculate the distance \( d \) between the normalised vectors \( {\boldsymbol{x}^{\prime}}^{(i)} \) and \( \boldsymbol{x}^{(j)} \), and
+    \item store \( \left( d, y^{(i)} \right) \) in a data structure \( T \) sorted by \( d \) in ascending order.
+  \end{enumerate}
+  \item Return the mode (or average or median for regression) of \( y^{(i)} \) over the first \( k \) entries of \( T \)\@.
+\end{enumerate}
+
+\subsection{Summary}
+
+The \( k \)-NN learning algorithm involves no real training.
+It is a simple case of storing the training samples, and the minimum and maximum of each numeric input attribute.
+This is a powerful approach when the number of training samples is small.
+The prediction algorithm is also very intuitive; it finds the mode, average or median of the output attribute over the training samples most similar to the new sample.
+
+The disadvantages of the \( k \)-NN approach are the large amount of memory required to store all the data, and the need to search all training samples to find the nearest neighbours --- both of which are major issues when the training set is large.
+More efficient variants of the approach do exist.
