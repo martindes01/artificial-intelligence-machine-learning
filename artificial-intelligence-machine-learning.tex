@@ -21,7 +21,9 @@
 \usepackage{amsmath} % AMS mathematical facilities for LaTeX
 \usepackage{amssymb} % TeX fonts from the American Mathematical Society
 \usepackage{booktabs} % Publication quality tables in LaTeX
+\usepackage{caption} % Customising captions in floating environments
 \usepackage[inline,shortlabels]{enumitem} % Control layout of itemize enumerate description
+\usepackage{graphicx} % Enhanced support for graphics
 \usepackage[skip=\glueexpr\baselineskip\relax]{parskip} % Layout with zero \parindent non-zero \parskip
 \usepackage[onehalfspacing]{setspace} % Set space between lines % setspace must be loaded before hyperref
 \usepackage{titlesec} % Select alternative section titles
@@ -61,7 +63,8 @@
       & 4 & Neural Networks, Hyperparameters and Metrics \\ [1ex]
     3 & 5 & Na\"{i}ve Bayes \\ [1ex]
     4 & 6 & Decision Trees \\
-      & 7 & \( k \)-Nearest Neighbours \\
+      & 7 & \( k \)-Nearest Neighbours \\ [1ex]
+    5 & 8 & Uninformed Search \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -93,5 +96,8 @@
 
 \section{\texorpdfstring{\( k \)}{k}-Nearest Neighbours}
 \input{unit-7/notes.tex}
+
+\section{Uninformed Search}
+\input{unit-8/notes.tex}
 
 \end{document}
