@@ -1,0 +1,292 @@
+\subsection{Search and Optimisation}
+
+A search algorithm systematically explores a search space, keeping a tree that represents possible paths, and returns a path to a goal, which describes the solution as a sequence of actions.
+When the sequence of actions is not important, and only a near optimal solution is required, it is possible to use algorithms that are more space efficient and do not require complex heuristics.
+
+\emph{Optimisation problems} are solved by finding a solution that minimises or maximises an \emph{objective function}.
+A problem may have \emph{constraints} that a solution must satisfy in order to be feasible.
+Common optimisation problems include routing, bin packing, scheduling and hyperparameter optimisation.
+
+Unlike a search algorithm, an \emph{optimisation algorithm} does not find a solution by building a path from an initial state to a goal state.
+Instead, it maintains an entire \emph{candidate solution}, which may or may not be feasible, and modifies it until it is optimal or near optimal.
+
+Since many search problems have costs associated to actions, they can be formulated as optimisation problems.
+Similarly, optimisation problems can often be formulated as search problems with cost functions.
+Optimisation algorithms can be used to solve search problems if a suitable objective function can be derived.
+
+The advantages of optimisation algorithms over search algorithms are that
+\begin{itemize}
+  \item they are usually more space efficient, since
+  \begin{itemize}
+    \item they do not maintain paths to solutions,
+    \item they usually require a fixed amount of space throughout the optimisation process, and
+    \item they are usually able to find reasonable solutions to problems with a large state space, for which tree-based search algorithms are unsuitable,
+  \end{itemize}
+  \item they can sometimes be more time efficient, depending on the algorithm used, and
+  \item they do not necessarily require problem-specific heurisitics.
+\end{itemize}
+
+Their disadvantages are that
+\begin{itemize}
+  \item although they can often find a good solution in a reasonable amount of time, they are not guaranteed to retrieve the optimal solution in a reasonable amount of time, and
+  \item they are not guaranteed to be complete (they are not guaranteed to find a feasible solution) --- this depends on the problem formulation and operators.
+\end{itemize}
+
+\subsection{Learning and Optimisation}
+
+Machine learning can be seen as a problem of finding parameters that minimise a loss function over all possible examples, including unseen data.
+It is impossible to calculate the loss of a model on unseen data during training.
+Thus, machine learning can be seen as a problem of optimising an objective function that cannot be computed.
+
+Optimisation is a problem of minimising or maximising the value of a known objective function.
+Nevertheless, there exist optimisation problems for which the exact value of the objective function cannot be computed.
+Some optimisation algorithms can be used as machine learning algorithms that minimise a loss function over training data.
+
+\subsection{Problem Formulation}
+
+The general formulation of an optimisation problem is to minimise some objective functions
+\begin{equation*}
+  \function[_{k}]{f}{\boldsymbol{x}}, \quad k = 1, \ldots, p
+\end{equation*}
+subject to some constraints
+\begin{gather*}
+  \function[_{i}]{g}{\boldsymbol{x}} \leq 0, \quad i = 1, \ldots, m \\
+  \function[_{j}]{h}{\boldsymbol{x}} = 0, \quad j = 1, \ldots, n
+\end{gather*}
+
+The \emph{design variable} \( \boldsymbol{x} \) is a representation of a candidate solution.
+The search space comprises all possible values of the design variable.
+A candidate solution replaces the initial state and goal state required for the formulation of a search problem.
+
+An objective function defines a quality to be maximised or a cost to be minimised.
+All maximisation problems can be formulated as minimisation problems and vice versa.
+An optimisation problem with multiple objective functions is known as a \emph{multi-objective} optimisation problem.
+The objective functions replace the cost function required for the formulation of a search problem.
+
+An optimisation problem may define constraints that a solution must satisfy in order to be feasible.
+The constraints replace the list of possible actions and their effects required for the formulation of a search problem.
+All constraints can be represented in the form of the inequality constraint \( \function[_{i}]{g}{\boldsymbol{x}} \leq 0 \) or the equality constraint \( \function[_{j}]{h}{\boldsymbol{x}} = 0 \).
+
+For example, the problem formulation for minimising the distance travelled on a route between an origin city and a destination city, using only defined paths between neighbouring cities on a given a map of \( N \) cities, is as follows.
+
+Minimise the objective function
+\begin{equation*}
+  \function{f}{\boldsymbol{x}} = \sum_{i=1}^{\left\lvert \boldsymbol{x} \right\rvert - 1} D_{x_{i},x_{i+1}}
+\end{equation*}
+subject to the constraints
+\begin{gather*}
+  \function[_{1}]{h}{\boldsymbol{x}} = 0 \\
+  \function[_{2}]{h}{\boldsymbol{x}} = 0
+\end{gather*}
+where
+\begin{itemize}
+  \item \( \boldsymbol{x} \) has any size, and its elements \( x_{i} \in \left\{ 1, \ldots, N \right\} \) each represent one of the \( N \) cities,
+  \item \( \mathbf{D} \) is a matrix of distances, with each element \( D_{i,j} \) being the distance to travel along the single path from city~\( i \) to its direct neighbour city~\( j \), or \( -1 \) if such a path does not exist,
+  \item the constraint to ensure that each step of the route is a defined path between two neighbouring cities is defined by
+  \begin{equation*}
+    \function[_{1}]{h}{\boldsymbol{x}} = \begin{cases}
+      0 & \text{if } D_{x_{i},x_{i+1}} \not= -1, \quad \forall i \in \left\{ 1, \ldots, \left\lvert \boldsymbol{x} \right\rvert - 1 \right\} \\
+      1 & \text{otherwise}
+    \end{cases}
+  \end{equation*}
+  \item the constraint to ensure that the route begins at the origin city \( 1 \) and ends at the destination city \( N \) is defined by
+  \begin{equation*}
+    \function[_{2}]{h}{\boldsymbol{x}} = \begin{cases}
+      0 & \text{if } x_{1} = 1 \text{ and } x_{\left\lvert \boldsymbol{x} \right\rvert} = N \\
+      1 & \text{otherwise}
+    \end{cases}
+  \end{equation*}
+\end{itemize}
+
+\subsection{Hill Climbing}
+
+Assuming maximisation, the \emph{hill~climbing} algorithm operates as follows.
+\begin{enumerate}
+  \item Initialise the current solution by generating an initial candidate solution at random.
+  \item Repeating until the maximum number of iterations is reached,
+  \begin{enumerate}
+    \item generate neighbour solutions --- candidate solutions that differ from the current solution by a single element,
+    \item get the best neighbour solution --- the neighbour solution with the greatest quality.
+    \item If the quality of the best neighbour is less than or equal to the quality of the current solution, do not change the current solution.
+    \item Otherwise, replace the current solution with the best neighbour solution.
+  \end{enumerate}
+\end{enumerate}
+
+The advantage of hill~climbing is that it very quickly finds the nearest solution of optimal quality.
+However, this solution may be a local optimum rather than the global optimum.
+This is because it is a \emph{greedy} algorithm --- it does not accept neighbours of equal or worse quality, only better.
+For the same reason, the current solution may become trapped on a plateaux --- a series of neighbour solutions with equal quality.
+The success of the algorithm depends on the shape of the objective function.
+As the algorithm is relatively simple, it can be used before more complex algorithms are investigated.
+
+Hill~climbing has the following properties.
+\begin{itemize}
+  \item It is not guaranteed to be optimal.
+  \item Its worst-case time complexity, assuming a maximum number of iterations \( m \), a maximum number of neighbours generated per iteration \( n \) and that the generation of neighbours has time complexity \( \function{O}{p} \), is \( \function{O}{mnp} \).
+  \item Its worst-case space complexity, assuming a maximum number of neighbours generated per iteration \( n \) and that the design variable has space complexity \( \function{O}{q} \), is \( \function{O}{nq} \).
+\end{itemize}
+
+The completeness of the algorithm --- whether is is guaranteed to find a feasible solution --- depends on the problem formulation and operators.
+
+\subsection{Simulated Annealing}
+
+In the \emph{simulated~annealing} algorithm, it is a random neighbour, rather than the best neighbour, that is compared to the current solution.
+There is also a probability-based chance for the current solution to be replaced by a worse neighbour on each iteration.
+
+The probability of accepting a solution of equal or worse quality (or a solution of equal or greater cost) than the current solution is inspired by thermodynamics, giving the algorithm its name.
+It is defined in terms of an \emph{error} \( \Delta E \) --- the difference between the qualities of the random neighbour and the current solution --- and a \emph{temperature} \( T \).
+\begin{equation*}
+  e^{\frac{\Delta E}{T}}, \quad \Delta E \leq 0, \quad T > 0
+\end{equation*}
+Since the probability is only used when the random solution is of equal or worse quality to the current solution, the error is always less than or equal to zero.
+Additionally, the temperature is defined to be always greater than zero.
+Thus, the probability decreases from one and approaches zero asymptotically as the error increases in magnitude (decreases further below zero) and the temperature decreases.
+
+The temperature \( T \) is set to a high initial value (a parameter of the algorithm).
+It is gradually reduced by update rules or \emph{schedules} as the algorithm progresses.
+Typically, it is multiplied by a positive coefficient close to and smaller than one on each iteration.
+\begin{equation*}
+  \text{Let } T = \alpha T, \quad \alpha = 0.95
+\end{equation*}
+This ensures that the temperature remains above zero and decreases slowly enough for the algorithm to explore the search space and pass over small optima.
+
+Thus, when used in the simulated~annealing algorithm, the probability for the random neighbour to replace the current solution has the following properties.
+\begin{itemize}
+  \item It decreases as the quality of the random neighbour decreases.
+  This ensures that the current solution does not stray too far from an optimum.
+  \item It decreases slowly as the algorithm progresses.
+  This increases the basis of attraction over time, and allows smaller optima in the search space to be passed without exploitation initially.
+\end{itemize}
+
+Assuming maximisation, the \emph{simulated~annealing} algorithm, with the input parameters of initial temperature and minimum temperature, operates as follows.
+\begin{enumerate}
+  \item Initialise the current solution by generating an initial candidate solution at random.
+  \item Set the temperature to the initial temperature.
+  \item Repeating until the minimum temperature is reached, or the current solution stops changing,
+  \begin{enumerate}
+    \item generate a random neighbour solution --- a candidate solution that differs from the current solution by a single element.
+    \item If the quality of the random neighbour is less than or equal to the quality of the current solution, decide based on the probability \( e^{\frac{\Delta E}{T}} \) whether to replace the current solution with the random neighbour solution.
+    \item Otherwise, replace the current solution with the random neighbour solution.
+    \item Update (schedule) the temperature.
+  \end{enumerate}
+\end{enumerate}
+
+Simulated~annealing is also a local search algorithm, as it only allows the current solution to move between neighbours.
+It employs methods to escape from local optima, however.
+The algorithm has the following properties.
+\begin{itemize}
+  \item It is not guaranteed to find the optimal solution in a reasonable amount of time.
+  \item Its time complexity is difficult to compute, as it depends on the schedule, minimum temperature and properties of the problem formulation.
+  \item Its space complexity depends on the representation of the design variable.
+\end{itemize}
+
+The completeness of the algorithm --- whether is is guaranteed to find a feasible solution --- depends on the problem formulation and operators.
+
+Whether it finds the optimal solution depends on the schedule and minimum temperature.
+If left to run indefinitely with a relaxed schedule, it is guaranteed to find the optimal solution, but this may take longer than the time needed to enumerate all possible solutions using brute force.
+Therefore, the advantage of simulated~annealing is that it can frequently obtain near optimal solutions by escaping from poor local optima in a reasonable amount of time.
+
+\subsection{Handling Constraints}
+
+\subsubsection{Travelling Salesman Problem (TSP)}
+
+In the \emph{travelling salesman problem} (TSP), a salesman must travel through \( N \) cities, subject to the following constraints.
+\begin{itemize}
+  \item Each city must be visited once and only once (an explicit constraint).
+  \item The salesman must begin and end the journey at the same city (an implicit constraint of the objective function).
+  \item Only the \( N \) cities may appear on the route (an implicit constraint of the design variable).
+\end{itemize}
+Each pair of cities has a distance between them.
+The total distance of the solution route is to be minimised.
+
+The problem formulation is as follows.
+
+Minimise the objective function
+\begin{equation*}
+  \function{f}{\boldsymbol{x}} = \left( \sum_{i=1}^{N-1} D_{x_{i},x_{i+1}} \right) + D_{x_{N},x_{1}}
+\end{equation*}
+subject to the constraint
+\begin{equation*}
+  \function[_{i}]{h}{\boldsymbol{x}} = 0, \quad \forall i \in \left\{ 1, \ldots, N \right\}
+\end{equation*}
+where
+\begin{itemize}
+  \item \( \boldsymbol{x} \) is a sequence of \( N \) cities, and its elements \( x_{i} \in \left\{ 1, \ldots, N \right\} \) each represent one of the \( N \) cities,
+  \item \( \mathbf{D} \) is a matrix of distances, with each element \( D_{i,j} \) being the distance to travel along the single path from city~\( i \) to its direct neighbour city~\( j \),
+  \item the constraint to ensure that a city \( i \) appears once and only once in the route is defined by
+  \begin{equation*}
+    \function[_{i}]{h}{\boldsymbol{x}} = \left( \sum_{j=1}^{N} 1 \left( x_{j} = i \right) \right) -1 = 0
+  \end{equation*}
+  using the \emph{indicator} function
+  \begin{equation*}
+    1 \left( x_{j} = i \right) \begin{cases}
+      1 & \text{if } x_{j} = i \\
+      0 & \text{if } x_{j} \not= i
+    \end{cases}
+  \end{equation*}
+\end{itemize}
+
+\subsubsection{Representation, Initialisation and Neighbourhood Operators}
+
+Most real-world problems have constraints.
+Optimisation algorithms do not usually include strategies for dealing with constraints.
+Instead, strategies must be designed for each problem.
+One way of doing this is to design the solution representation, initialisation and neighbourhood operators in such a way that they ensure the constraints are always satisfied.
+
+The representation for a TSP solution could be an array of size \( N \), where \( N \) is the number of cities to visit.
+The omission from the representation of the return to the origin city helps to deal with the implicit constraint that the salesman must begin and end the journey at the same city.
+
+The initialisation method for a TSP solution could be to draw cities uniformly at random from the set \( \left\{ 1, \ldots, N \right\} \) without replacement.
+This ensures that no cities are missing or duplicated in the initial solution (an explicit constraint), and that only the cities in the given set are visited (an implicit constraint).
+
+The neighbourhood operator for a TSP solution could reverse the path between two randomly selected cities.
+Alongside the initialisation method, this ensures that no cities are missing or duplicated in neighbourhood solution (an explicit constraint), and that only the cities in the given set are visited (an implicit constraint).
+
+Together, this design of representation, initialisation and neighbourhood operator ensures that the constraints of the problem are satisfied.
+
+The advantage of handling constraints in this way is that it is ensured that no infeasible candidate solutions are generated.
+However, the design is problem-specific, and may be difficult to derive.
+Additionally, it may restrict the search space too harshly, making it difficult to find the optimal solution.
+
+Using this strategy, optimisation algorithms such as hill~climbing and simulated~annealing are complete, as infeasible solutions are never generated.
+
+\subsubsection{Objective Function}
+
+Another method of handling constraints is to modify the objective function such that it penalises any infeasible solution by increasing its cost.
+
+For example, assuming the representation for a TSP solution is a list of cities of any size, and that the initialisation method allows missing and duplicate cities, two properties of a candidate solution would be the number of missing cities \( n_{\mathrm{m}} \) and the number of duplicate cities \( n_{\mathrm{d}} \).
+These could be multiplied by a large positive constant \( P \) and included as penalty terms in the objective function.
+\begin{equation*}
+  \function{f}{\boldsymbol{x}} = \left( \sum_{i=1}^{N-1} D_{x_{i},x_{i+1}} \right) + D_{x_{N},x_{1}} + n_{\mathrm{m}} P + n_{\mathrm{d}} P
+\end{equation*}
+The value of \( P \) should be large enough such that any infeasible solution is more expensive than any feasible solution.
+
+More generally, the problem formulation is modified as follows.
+
+Minimise the objective functions
+\begin{equation*}
+  \function[_{k}]{f}{\boldsymbol{x}} + \function{Q}{\boldsymbol{x}}, \quad k = 1, \ldots, p
+\end{equation*}
+subject to some constraints
+\begin{gather*}
+  \function[_{i}]{g}{\boldsymbol{x}} \leq 0, \quad i = 1, \ldots, m \\
+  \function[_{j}]{h}{\boldsymbol{x}} = 0, \quad j = 1, \ldots, n
+\end{gather*}
+where the penalty function \( \function{Q}{\boldsymbol{x}} \) is zero if the solution is feasible, or the weighted sum of the squares of only the violated constraints otherwise.
+\begin{equation*}
+  \function{Q}{\boldsymbol{x}} = \begin{cases}
+    0 & \text{if } \boldsymbol{x} \text{ is feasible} \\
+    P \left( \function[_{a}]{g}{\boldsymbol{x}}^{2} + \function[_{b}]{g}{\boldsymbol{x}}^{2} + \ldots + \function[_{a'}]{h}{\boldsymbol{x}}^{2} + \function[_{b'}]{h}{\boldsymbol{x}}^{2} + \ldots \right) & \text{ otherwise}
+  \end{cases}
+\end{equation*}
+
+Only the constraints that are violated are included in the penalty.
+This ensures that unviolated inequality constraints do not penalise the solution.
+The values of the constraints are squared to ensure they are positive and increase the cost of the solution.
+
+The advantage of handling constraints in this way is that the penalty is general and could be applied to any optimisation problem.
+However, the algorithm must search for feasible solutions amongst infeasible solutions.
+This may be a poor choice of strategy for problems in which there are many infeasible solutions.
+
+Using this strategy, optimisation algorithms such as hill~climbing and simulated~annealing may not be complete, as infeasible solutions may be generated.
+In particular, hill~climbing is not complete if the object function has local optima, and simulated~annealing is not guaranteed to find a feasible solution within a reasonable amount of time.
