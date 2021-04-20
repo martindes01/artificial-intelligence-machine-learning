@@ -1,0 +1,197 @@
+﻿\subsection{Concepts}
+
+\subsubsection{Sparse Data}
+
+\emph{Reinforcement learning} is a process by which an agent learns to interact with an environment based on the feedback signals (rewards) it receives from the environment, in order to achieve a goal efficiently.
+Unlike supervised learning, reinforcement learning does not require any background knowledge of the problem or any labelled data.
+The agent gains sparse data and time-delayed rewards by interacting with the environment without supervision, rather than learning the structure of training data.
+The data gained is sparse because some actions may not result in a reward.
+The goal of the agent is to maximise its future rewards, rather than to find a function that maps input to output.
+
+Some advantages of reinforcement learning are that
+\begin{itemize}
+  \item no human needs to generate training data, and
+  \item the performance of the agent is not limited to the performance shown in training data; the agent is permitted to improve by generating new data.
+\end{itemize}
+
+\subsubsection{Rewards}
+
+A reward \( R_{t} \) is an immediate feedback signal that indicates the performance of the agent at step~\( t \).
+The goal of the agent is to maximise its cumulative reward.
+It is not sufficient to maximise the immediate or final rewards, since it is necessary to find the most efficient way to complete the task.
+An action may result in a delayed reward, and it may be better to sacrifice an immediate reward for a long-term reward.
+
+\subsubsection{Agent, Environment and State}
+
+At each step \( t \),
+\begin{itemize}
+  \item the agent
+  \begin{itemize}
+    \item receives an observation \( O_{t} \),
+    \item receives a reward \( R_{t} \), and
+    \item executes an action \( A_{t} \),
+  \end{itemize}
+  \item the environment
+  \begin{itemize}
+    \item receives the action \( A_{t} \),
+    \item emits an observation \( O_{t+1} \), and
+    \item emits a reward \( R_{t+1} \), and
+  \end{itemize}
+  \item the state \( S_{t} \) is a summary of the environment that is used to determine the next action.
+\end{itemize}
+
+The agent observes the environment indirectly.
+This is known as \emph{partial observation}.
+An \emph{episode} is a series of consecutive states that form a single attempt of the agent to complete the task.
+
+\subsubsection{Policy}
+
+The \emph{policy} \( \pi \) of an agent is a function that maps a state \( s \) to an action \( a \).
+A \emph{deterministic} policy \( \pi\!\left(s\right) \) always maps a given state to the same action.
+\begin{equation*}
+  a = \pi\!\left(s\right)
+\end{equation*}
+A \emph{stochastic} policy \( \pi\!\left(a \vert s \right) \) maps a state to one of many actions based on a probability.
+\begin{equation*}
+  \pi\!\left(a \vert s \right) = P\!\left( A = a \vert S = s \right)
+\end{equation*}
+This allows the agent to explore more states and make more observations.
+
+\subsubsection{Value Function}
+
+The \emph{value~function} \( V_{\pi}\!\left(s\right) \) of a state \( s_{t} \) using policy \( \pi \) is a prediction of the future reward that will be received following a transition to that state.
+This is used to evaluate the quality of a state.
+\begin{equation*}
+  V_{\pi}\!\left(s_{t}\right) = E_{\pi}\!\left( R_{t} + \gamma R_{t+1} + \gamma^{2} R_{t+2} \ldots \vert S_{t} = s \right), \quad 0 \leq \gamma \leq 1
+\end{equation*}
+The \emph{discount~rate} \( \gamma \) reflects the importance of future rewards.
+A value of \( \gamma = 0 \) is used to ignore future rewards.
+A value of \( \gamma = 1 \) is used to treat immediate and future rewards with the same importance.
+
+\subsubsection{Types of Agent}
+
+A \emph{value-based agent} learns to achieve a task by constructing a value function.
+In this case, the policy is implicit and can be derived directly from the value function.
+
+A \emph{policy-based agent} learns to achieve a task by constructing a representation of the policy.
+In this case, there is no need for a value function.
+
+An \emph{actor-critic agent} uses both a value function and a policy.
+
+\subsection{\texorpdfstring{\( Q \)}{Q}-Learning}
+
+\emph{\( Q \)-learning} is a model-free and value-based reinforcement learning algorithm.
+It learns by constructing an action-value function known as the \emph{\( Q \)-function} that predicts the future reward that will be received following a transition to a state \( s_{t} \) via an action \( a_{t} \).
+It is used to evaluate the quality of a state and action pair.
+\begin{equation*}
+  Q_{\pi}\!\left(s_t, a_{t}\right) = E_{\pi}\!\left( R_{t} + \gamma R_{t+1} + \gamma^{2} R_{t+2} \ldots \vert S = s_{t}, A = a_{t} \right), \quad 0 \leq \gamma \leq 1
+\end{equation*}
+
+\( Q \)-learning constructs a matrix known as a \emph{\( Q \)-table} that records the value of the \( Q \)-function for each state and action pair.
+This table is used to select the best action at a given state.
+
+The \emph{Bellman~equation} is used to update the \( Q \)-table during the learning process.
+The new value \( Q'\!\left( s_{t}, a_{t} \right) \) is calculated using the old value \( Q\!\left( s_{t}, a_{t} \right) \), the \emph{learning~rate} \( \alpha \), the immediate reward \( R\!\left( s_{t}, a_{t} \right) \), the discount~rate \( \gamma \) and the maximum expected future reward \( Q\!\left( s_{t+1}, a \right) \) at state \( s_{t+1} \).
+\begin{equation*}
+  Q'\!\left( s_{t}, a_{t} \right) = \left( 1 - \alpha \right) Q\!\left( s_{t}, a_{t} \right) + \alpha \left( R\!\left( s_{t}, a_{t} \right) + \gamma \max_{a} Q\!\left( s_{t+1}, a \right) \right)
+\end{equation*}
+
+The \( Q \)-learning algorithm proceeds as follows.
+\begin{enumerate}
+  \item Initialise each element of the \( Q \)-table with the same arbitrary fixed value.
+  \item For each episode,
+  \begin{enumerate}
+    \item select a random initial state, and
+    \item until the goal state is reached,
+    \begin{enumerate}
+      \item select an action at random,
+      \item perform the action and move to the corresponding next state,
+      \item receive the reward, and
+      \item update the entry for the state and action pair in the \( Q \)-table using the Bellman equation.
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
+
+Initially, the \( Q \)-table gives the same arbitrary fixed value for all state and action pairs.
+As the states and actions are explored, the \( Q \)-table gives better predictions.
+
+Often, zero is used as the initial value for the \( Q \)-table.
+Since \( Q \)-learning is a greedy algorithm, this may lead to the agent always choosing a non-optimal action that has already been explored.
+One solution to this problem is to initialise the \( Q \)-table with a high value.
+This makes unexplored states and actions more appealing, and encourages the greedy agent to explore.
+This is known as \emph{absolute~greedy exploration}.
+
+It is also possible to initialise areas of the \( Q \)-table with different values.
+This creates bias towards some states and actions, allowing the agent to take advantage of prior knowledge of the problem.
+
+\subsection{Deep \texorpdfstring{\( Q \)}{Q}-Networks}
+
+For a problem in which there are many states that each have many actions, it is difficult to maintain the \( Q \)-table.
+A deep network known as a \emph{deep \( Q \)-network} is used to approximate the \( Q \)-function.
+Whereas \( Q \)-learning produces \( Q \)-values for state and action pairs, deep \( Q \)-learning takes a state as an input and produces the \( Q \)-values of each action available at the given state.
+
+\subsection{Policy Gradient}
+
+A value-based algorithm such as \( Q \)-learning cannot handle continuous input or sparse rewards.
+It also cannot learn a stochastic policy.
+This means that it cannot easily explore the reward space.
+These problems are solved by policy-based agents.
+
+\emph{Policy gradient} is a model-free and policy-based reinforcement learning algorithm.
+It begins by creating an arbitrarily random policy and exploring for several episodes.
+The probabilities of actions that lead to a high reward are increased.
+The probabilities of actions that lead to a low reward are decreased.
+
+The quality of a policy \( \pi_{\theta} \) on a network \( \theta \) is measured using a score function \( J\!\left( \theta \right) \) that operates on the stored transitions of all episodes where the agent used the policy \( \pi_{\theta} \), and calculates the probabilities that the environment is in state \( s \) and that the agent takes action \( a \) in that state.
+Each stored transition consists of a state \( s \), an action \( a \) and a reward \( R\!\left( s, a \right) \).
+\begin{equation*}
+  J\!\left( \theta \right) = \sum_{s} \left( P\!\left( s \right) \sum_{a} \left( P\!\left( a \vert s \right) R\!\left( s, a \right) \right) \right)
+\end{equation*}
+The parameters of the policy are updated via gradient ascent, where the gradient is that of the score of the policy.
+
+\subsection{Model-Free and Model-Based Learning}
+
+Both \( Q \)-learning and policy gradient are \emph{model-free} algorithms.
+This means that the agent is given no prior knowledge of the problem.
+
+A \emph{model-based} algorithm uses a model that describes the distribution of states and rewards in the environment.
+This allows the agent to make informed decisions and reduces the need to explore.
+
+\subsection{Actor-Critic Learning}
+
+While policy gradient can handle both continuous and discrete action spaces, it takes longer to train than \( Q \)-learning since it needs to collect more data.
+An actor-critic agent uses aspects of both value-based and policy-based learning to provide a balance between exploration of the environment and exploitation of reward.
+
+\subsection{\texorpdfstring{\( \varepsilon \)}{Epsilon}-Greedy Exploration}
+
+The \( Q \)-learning algorithm can be modified to provide a balance between exploration and exploitation using \emph{\( \varepsilon \)-greedy exploration}.
+When selecting an action to take, the agent has a probability \( \varepsilon \) of selecting an action at random, and a probability of \( \left( 1 - \varepsilon \right) \) of selecting the action with the greatest \( Q \)-value.
+
+The \( \varepsilon \)-greedy \( Q \)-learning algorithm proceeds as follows.
+\begin{enumerate}
+  \item Initialise each element of the \( Q \)-table with the same arbitrary fixed value.
+  \item For each episode,
+  \begin{enumerate}
+    \item select a random initial state, and
+    \item until the goal state is reached,
+    \begin{enumerate}
+      \item select an action using the \( \varepsilon \)-greedy strategy,
+      \item perform the action and move to the corresponding next state,
+      \item receive the reward, and
+      \item update the entry for the state and action pair in the \( Q \)-table using the Bellman equation.
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
+
+One method of encouraging initial exploration and later exploitation is to start with a high probability \( \varepsilon \) and to decrease it at the end of each episode.
+
+One problem with \( \varepsilon \)-greedy exploration is that it treats all actions other than the best action equally.
+If there are a few actions that seem better than others, it may be more sensible to select only from these.
+This would focus on determining which of the seemingly good actions is best, rather than exploring the seemingly bad actions.
+
+\subsection{Credit Assignment Problem}
+
+In reinforcement learning, it is assumed that all actions in a poor episode are poor actions.
+The likelihood of all of these actions is reduced, even though it is likely that only a few of the actions are bad.
+The problem of determining which action leads to which reward is known as the \emph{credit assignment problem}.
+A setting in which the reward is received only at the end of an episode is known as a \emph{sparse reward setting}.
