@@ -1,0 +1,136 @@
+\subsection{Clustering}
+
+\emph{Clustering} is used to find natural groupings among objects.
+Clustering algorithms are unsupervised learning algorithms, so they do not require any labelled data.
+They are used to separate input data into smaller groups or \emph{clusters} that have high intra-cluster similarity and low inter-cluster similarity.
+
+In order to determine the similarity between two points, a measure of distance is used.
+This is typically squared Euclidean distance.
+The squared Euclidean distance \( d^{2}\!\left( \boldsymbol{p}, \boldsymbol{q} \right) \) between two points \( \boldsymbol{p} \) and~\( \boldsymbol{q} \) in \( d \)-dimensional space is given by
+\begin{equation*}
+  d^{2}\!\left( \boldsymbol{p}, \boldsymbol{q} \right) = \left( q_{1} - p_{1} \right)^{2} + \left( q_{2} - p_{2} \right)^{2} + \ldots + \left( q_{d} - p_{d} \right)^{2}
+\end{equation*}
+
+\subsection{\texorpdfstring{\( k \)}{k}-Means Clustering}
+
+Given \( n \)~points in \( d \)~dimensions, the goal of \emph{\( k \)-means clustering} is to create \( k \)~clusters such that the \emph{intra-cluster variance} is minimal.
+The intra-cluster variance of a cluster is the average distance from its \emph{centroid} to one of its points, computed over all points in the cluster.
+Using squared Euclidean distance, the intra-cluster variance of a cluster with centroid \( \boldsymbol{c} \) that comprises the set of points \( X \) is given by
+\begin{equation*}
+  \frac{1}{\left\lvert X \right\rvert} \sum_{\boldsymbol{x} \in X} d^{2}\!\left( \boldsymbol{c}, \boldsymbol{x} \right)
+\end{equation*}
+The components of the centroid \( \boldsymbol{c} \) of a cluster that comprises the set of points \( X \) are given by
+\begin{equation*}
+  c_{i} = \frac{1}{\left\lvert X \right\rvert} \sum_{\boldsymbol{x} \in X} x_{i}, \quad \forall i \in \left[ 1, D \right]
+\end{equation*}
+
+This problem is \emph{NP-hard} (non-deterministic polynomial acceptable); \( k \)-means simply provides an approximation.
+It is possible for the \( k \)-means algorithm to find local minima, so it must be run multiple times.
+
+The algorithm proceeds as follows.
+\begin{enumerate}
+  \item Initialise \( k \) cluster points at random.
+  \item Repeating until there is no further change to the clusters,
+  \begin{enumerate}
+    \item assign each input datum to the closest cluster point according to the chosen distance metric,
+    \item find the centroid of each cluster, and
+    \item move each cluster point to the centroid of its cluster.
+  \end{enumerate}
+\end{enumerate}
+
+The cost at the end of each iteration is the sum of the intra-cluster variances of all clusters.
+The optimal value of \( k \) can be determined from a plot of intra-cluster variance against \( k \) as the integer value of \( k \) immediately before the curve abruptly reduces gradient to a plateau.
+
+\subsection{Agglomerative Hierarchical Clustering}
+
+\emph{Hierarchical clustering} is used to create a hierarchical decomposition of a set of objects.
+It summarises the input data into a binary tree known as a \emph{dendrogram}.
+\emph{Agglomerative} (bottom-up) hierarchical clustering involves combining child clusters into larger parent clusters in the hierarchy, whereas \emph{divisive} (top-down) hierarchical clustering involves splitting parent clusters into smaller child clusters.
+Agglomerative hierarchical clustering is used more often as it is significantly less computationally expensive.
+
+Each iteration of the agglomerative hierarchical clustering algorithm produces a higher level of the dendrogram with one fewer cluster.
+Thus, each level of the dendrogram shows how data can be grouped into a different number of clusters.
+
+The algorithm proceeds as follows.
+\begin{enumerate}
+  \item Place each input datum into its own singleton cluster.
+  \item Repeating until all data are merged into a single cluster,
+  \begin{enumerate}
+    \item create a new highest level in the dendrogram that comprises all the clusters in the level below it, and
+    \item in the new level, merge the two closest clusters according to some inter-cluster distance metric.
+  \end{enumerate}
+\end{enumerate}
+
+Three possible inter-cluster distance metrics are
+\begin{itemize}
+  \item single linkage,
+  \item complete linkage, and
+  \item group average.
+\end{itemize}
+
+\emph{Single linkage} is the distance between the closest pair of data (with one datum from each cluster).
+This merging strategy tends to produce long chains of clusters.
+\begin{equation*}
+  d_{\text{sl}}\!\left( G, H \right) = \min_{i \in G, j \in H} d_{i,j}
+\end{equation*}
+
+\emph{Complete linkage} is the distance between the farthest pair of data (with one datum from each cluster).
+This merging strategy tends to merge data points that are far apart and produce compact clusters, but it is sensitive to noise in the data.
+\begin{equation*}
+  d_{\text{cl}}\!\left( G, H \right) = \max_{i \in G, j \in H} d_{i,j}
+\end{equation*}
+
+\emph{Group average} is the average of distances between all possible pairs of data (with one datum from each cluster).
+This merging strategy is robust against noise and is the most commonly used.
+\begin{equation*}
+  d_{\text{ga}}\!\left( G, H \right) = \frac{1}{\left\lvert G \right\rvert \left\lvert H \right\rvert} \sum_{i \in G, j \in H} d_{i,j}
+\end{equation*}
+
+The advantages of agglomerative hierarchical clustering are that
+\begin{itemize}
+  \item it provides deterministic results,
+  \item there is no need to specify a number of clusters beforehand, and
+  \item it can create clusters of arbitrary shapes and sizes.
+\end{itemize}
+Its disadvantages are that
+\begin{itemize}
+  \item it does not scale well for large datasets, as it has a time complexity of at least \( O\!\left( n^{2} \right) \),
+  \item different inter-cluster distance metrics can lead to vastly different dendrograms, and
+  \item it imposes a hierarchical structure on the data, regardless of whether such a structure is semantically appropriate.
+\end{itemize}
+
+\subsection{Gaussian Mixture Models and Expectation Maximisation}
+
+In \emph{probabilistic modelling}, it is assumed that the input data is produced by a generative model.
+The goal is to find the parameters of the model that maximise the probability that it can produce the data observed.
+
+One type of probabilistic model is the \emph{Gaussian mixture model} (GMM).
+It is assumed that the input data is produced by a set of \( K \) Gaussian distributions \( \mathcal{N}_{k} \), each parametrised by a mean \( \mu_{k} \) and a variance \( \sigma_{k}^{2} \).
+The GMM is, therefore, parametrised by a vector of means \( \boldsymbol{\mu} \), a vector of variances \( \boldsymbol{\sigma^{2}} \) and a vector of weights \( \boldsymbol{\pi} \) that determine the magnitude of the contribution of each constituent distribution.
+These three vector parameters are optimised using the \emph{expectation maximisation} algorithm.
+
+The probability density function of a Gaussian distribution \( \mathcal{N}_{k}\!\left( \mu_{k}, \sigma_{k}^{2} \right) \) for an input vector \( \boldsymbol{x} \) is given by
+\begin{equation*}
+  P\!\left(\boldsymbol{x} \vert \mu_{k}, \sigma_{k}^{2}\right) = \frac{1}{\sqrt{2 \sigma_{k}^{2} \pi}} e^{- \frac{\left( a - \mu_{k} \right)^{2}}{2 \sigma_{k}^{2}}}
+\end{equation*}
+
+The probability density function of a GMM for an input vector \( \boldsymbol{x} \) is given by
+\begin{equation*}
+  P\!\left(\boldsymbol{x} \vert \boldsymbol{\mu}, \boldsymbol{\sigma^{2}}, \boldsymbol{\pi}\right) = \sum_{k=1}^{K} P\!\left(\boldsymbol{x} \vert \mu_{k}, \sigma_{k}^{2}\right), \quad \sum_{k=1}^{K} \pi_{k} = 1, \quad \pi_{k} \geq 0 \quad \forall k \in \left[ 1, K \right]
+\end{equation*}
+
+To optimise the model for the best possible fit for the input matrix \( \mathbf{X} \) of \( N \) inputs \( \boldsymbol{x}^{(n)} \), it is necessary to maximise the log-likelihood given by
+\begin{equation*}
+  \ln P\!\left(\mathbf{X} \vert \boldsymbol{\mu}, \boldsymbol{\sigma^{2}}, \boldsymbol{\pi}\right) = \sum_{n=1}^{N} \ln P\!\left(\boldsymbol{x}^{(n)} \vert \boldsymbol{\mu}, \boldsymbol{\sigma^{2}}, \boldsymbol{\pi}\right)
+\end{equation*}
+
+This done using \emph{expectation maximisation}.
+In the expectation step, the values of \( \boldsymbol{\mu} \), \( \boldsymbol{\sigma^{2}} \) and \( \boldsymbol{\pi} \) are assumed and used to calculate the posterior probability that a datum belongs to a cluster, given the datum, for each datum and cluster.
+Each cluster is represented by a \emph{hidden} or \emph{latent} class.
+The posterior probability that a datum belongs to a cluster, given the datum, is known as the \emph{responsibility} of the cluster over the datum.
+In the maximisation step, it is assumed that the data are distributed in the manner suggested by the current responsibilities, and the parameters of the GMM are adjusted to maximise the probability that each Gaussian distribution has generated the data for which it is currently assumed to be responsible.
+The two steps are repeated until the solution converges.
+
+Expectation maximisation is a general algorithm for optimising a latent variable model.
+It iteratively computes a lower bound then optimises it.
+It is possible for the algorithm to find a local optimum, so it must be run multiple times.
